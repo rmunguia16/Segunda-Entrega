@@ -2,53 +2,72 @@ import { Router } from 'express';
 import path from 'path';
 import __dirname from "../utils.js";
 import PM from '../../productManager.js';
+import productModel from '../models/products.models.js';
 
 const productsFile = '../products.json';
 
-let pm = new PM.ProductManager(path.resolve(__dirname,productsFile));
+let pm = new PM.ProductManager(path.resolve(__dirname, productsFile));
 
-const router = Router();
+const productRouter = Router();
 
-router.get('/', (req, res) => {
-    let products = pm.getProducts();
-    let {limit} = req.query;
-    if (limit == undefined) {
-        res.send(products)
-    }
-    else {
-        let productLimit = [];
-        for (let i = 0; i < limit; i++) {
-            productLimit.push(products[i]);
-        }
-        res.send(productLimit);
+productRouter.get('/', (req, res) => {
+    let { limit } = req.query;
+    try {
+        //let products = pm.getProducts();
+        let products = productModel.find().limit(limit);
+        res.status(200).send(products)
+    } catch (error) {
+        res.status(400).send({ error: `Error al consultar productos: ${error.message}` });
     }
 });
 
-router.get('/:pid', (req, res) => {
+productRouter.get('/:pid', (req, res) => {
     const { pid } = req.params;
-    console.log("El id solicitado es "+pid);
-    res.send(pm.getProductsById(pid));
+    try {
+        //let products = pm.getProducts();
+        const product = productModel.findById(pid);
+        product ? res.status(200).send(product) : res.status(404).send({ error: `No se encontró el producto ${pid}` });
+    } catch (error) {
+        res.status(400).send({ error: `Error al consultar el producto ${pid}: ${error.message}` });
+    }
 });
 
-router.post('/', (req, res) => {
-    let answer = pm.addProduct(req.body);
-    res.send(answer);
+productRouter.post('/', (req, res) => {
+    const { title, description, stock, code, price, category } = req.body;
+    try {
+        const product = productModel.create({
+            title, description, stock, code, price, category
+        });
+        res.status(200).send({ resultado: 'OK', message: product })
+    } catch (error) {
+        res.status(400).send({ error: `Error al crear el producto ${pid}: ${error.message}` });
+    }
 });
 
 
-
-router.put('/:pid', (req, res) => {
+productRouter.put('/:pid', (req, res) => {
     const { pid } = req.params;
-    let answer = pm.updateProduct(pid, req.body);
-    res.send(answer);
+    const { title, description, stock, code, price, category } = req.body;
+    try {
+        const respuesta = productModel.findByIdAndUpdate(pid, {
+            title, description, stock, code, price, category
+        });
+        respuesta ? res.status(200).send({ resultado: 'OK', message: respuesta }) : res.status(404).send({ error: `No se encontró el producto ${pid}` });
+    } catch (error) {
+        res.status(400).send({ error: `Error al actualizar el producto ${pid}: ${error.message}` });
+    }
 });
 
 
 
-router.delete('/:pid', (req, res) => {
-    const pid = req.params.pid;
-    pm.deleteProduct(pid);
-    res.send({ status: 'success', message: 'Product deleted.' });
+productRouter.delete('/:pid', (req, res) => {
+    const { pid } = req.params;
+    try {
+        const respuesta = productModel.findByIdAndDelete(pid);
+        respuesta ? res.status(200).send({ resultado: 'OK', message: respuesta }) : res.status(404).send({ error: `No se encontró el producto ${pid}` });
+    } catch (error) {
+        res.status(400).send({ error: `Error al borrar el producto ${pid}: ${error.message}` });
+    }
 });
 
-export default router;
+export default productRouter;

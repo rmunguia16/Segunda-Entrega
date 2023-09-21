@@ -14,7 +14,7 @@ let cart = new CM.CartManager(path.resolve(__dirname, cartFile));
 const router = Router();
 
 router.get("/", (req, res) => {
-    //res.send(cart.getCarts());
+    res.send(cart.getCarts());
 });
 
 router.get("/:cid", (req, res) => {
