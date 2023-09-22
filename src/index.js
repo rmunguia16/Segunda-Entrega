@@ -6,11 +6,19 @@ import __dirname from "./utils.js";
 import path from 'path';
 import { Server } from 'socket.io';
 import PM from '../productManager.js';
+import mongoose from 'mongoose';
 
 const pm = new PM.ProductManager(path.resolve(__dirname, '../products.json'));
+const PORT = 4000;
+const uri = "mongodb+srv://rulink:coderhouse@cluster0.qa4tn25.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp";
+
+mongoose.connect(uri)
+    .then(() => console.log('Base de datos conectada'))
+    .catch(e => console.log(e));
+
 
 const app = express();
-const server = app.listen(8080, () => {console.log('\nServidor escuchando en http://localhost:8080');});
+const server = app.listen(PORT, () => {console.log(`\nServidor escuchando en http://localhost:${PORT}`);});
 const io = new Server(server);
 
 io.on('connection', (socket) => {

@@ -9,7 +9,7 @@
     "socket.io": "^4.7.2",
     "uuid": "^9.0.0"
   },
-  "name": "desafio5",
+  "name": "segundaEntrega",
   "version": "1.0.0",
   "main": "./src/index.js",
   "scripts": {

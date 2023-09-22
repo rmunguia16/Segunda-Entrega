@@ -1,12 +1,6 @@
 import { Router } from 'express';
-import path from 'path';
 import __dirname from "../utils.js";
-import PM from '../../productManager.js';
-import productModel from '../models/products.models.js';
-
-const productsFile = '../products.json';
-
-let pm = new PM.ProductManager(path.resolve(__dirname, productsFile));
+import {productModel} from '../models/products.models.js';
 
 const productRouter = Router();
 
@@ -14,7 +8,8 @@ productRouter.get('/', (req, res) => {
     let { limit } = req.query;
     try {
         //let products = pm.getProducts();
-        let products = productModel.find().limit(limit);
+        let products = await productModel.find();
+        console.log(products);
         res.status(200).send(products)
     } catch (error) {
         res.status(400).send({ error: `Error al consultar productos: ${error.message}` });

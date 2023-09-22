@@ -32,5 +32,4 @@ const messageSchema = new Schema({
     thumbnail: []
 });
 
-const productModel = model('products', messageSchema);
-export default productModel;
+export const productModel = model('products', messageSchema);
