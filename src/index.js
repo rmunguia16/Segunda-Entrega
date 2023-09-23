@@ -8,7 +8,7 @@ import path from 'path';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
 import {productModel} from './models/products.models.js';
-import cartModel from './models/cart.models.js';
+import cartModel from './models/cart.models.js';    
 import {allowInsecurePrototypeAccess} from '@handlebars/allow-prototype-access';
 
 const PORT = 4000;

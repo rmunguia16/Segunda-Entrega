@@ -7,11 +7,22 @@ const cartRouter = Router();
 
 cartRouter.get("/", async (req, res) => {
     try {
-        const cart = await cartModel.findOne({_id: "650e8b3a5135e9c1fec876bc"})
+        const cart = await cartModel.find()
         res.status(200).send(cart);
     }
     catch (e) {
         res.status(400).send({ error: `Error al consultar los carritos: ${e}` });
+    }
+});
+
+cartRouter.post("/", async (req, res) => {
+    try {
+        const cart = await cartModel.create();
+        console.log(cart);
+        res.status(200).send({ respuesta: 'OK', mensaje: response })
+    }
+    catch (e) {
+        res.status(400).send({ error: `Error al agregar al carrito: ${e}` });
     }
 });
 
@@ -24,6 +35,21 @@ cartRouter.post("/:cid/products/:pid", async (req, res) => {
         if (cart) {
             cart.products.push({ id_product: pid, quantity: quantity })
             const response = await cartModel.findByIdAndUpdate(cid, cart)
+            res.status(200).send({ respuesta: 'OK', mensaje: response })
+        }
+    }
+    catch (e) {
+        res.status(400).send({ error: `Error al agregar al carrito: ${e}` });
+    }
+});
+
+cartRouter.delete("/:cid/products/:pid", async (req, res) => {
+    try {
+        const cart = await cartModel.findById(cid);
+        console.log(cart);
+        if (cart) {
+            cart.products.push({ id_product: pid, quantity: quantity })
+            const response = await cartModel.findByIdAndDelete(cid, cart)
             res.status(200).send({ respuesta: 'OK', mensaje: response })
         }
     }

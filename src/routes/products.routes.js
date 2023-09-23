@@ -5,11 +5,20 @@ import {productModel} from '../models/products.models.js';
 const productRouter = Router();
 
 productRouter.get('/', async (req, res) => {
-    let { limit } = req.query;
+    let { limit, page, sort, query } = req.query;
+    console.log(query);
+    console.log(req.query);
     try {
         //let products = pm.getProducts();
-        const products = await productModel.find().limit(parseInt(limit));
-        console.log(products);
+        let products
+        products = await productModel.paginate(query?{category:query}:{},{limit:limit,page:page,sort:{price:sort}});
+        /* if (query) {
+                products = await productModel.paginate({category:query},{limit:limit,page:page,sort:{price:sort}});
+            }
+        else {
+            products = await productModel.paginate({}, { limit: limit ,page: page,sort:{price:sort}});
+        } */
+        //console.log(products);
         res.status(200).send(products)
     } catch (error) {
         res.status(400).send({ error: `Error al consultar productos: ${error.message}` });
