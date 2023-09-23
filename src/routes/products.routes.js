@@ -4,11 +4,11 @@ import {productModel} from '../models/products.models.js';
 
 const productRouter = Router();
 
-productRouter.get('/', (req, res) => {
+productRouter.get('/', async (req, res) => {
     let { limit } = req.query;
     try {
         //let products = pm.getProducts();
-        let products = await productModel.find();
+        const products = await productModel.find().limit(parseInt(limit));
         console.log(products);
         res.status(200).send(products)
     } catch (error) {
@@ -16,21 +16,21 @@ productRouter.get('/', (req, res) => {
     }
 });
 
-productRouter.get('/:pid', (req, res) => {
+productRouter.get('/:pid', async (req, res) => {
     const { pid } = req.params;
     try {
         //let products = pm.getProducts();
-        const product = productModel.findById(pid);
+        const product = await productModel.findById(pid);
         product ? res.status(200).send(product) : res.status(404).send({ error: `No se encontró el producto ${pid}` });
     } catch (error) {
         res.status(400).send({ error: `Error al consultar el producto ${pid}: ${error.message}` });
     }
 });
 
-productRouter.post('/', (req, res) => {
+productRouter.post('/', async (req, res) => {
     const { title, description, stock, code, price, category } = req.body;
     try {
-        const product = productModel.create({
+        const product = await productModel.create({
             title, description, stock, code, price, category
         });
         res.status(200).send({ resultado: 'OK', message: product })
@@ -40,11 +40,11 @@ productRouter.post('/', (req, res) => {
 });
 
 
-productRouter.put('/:pid', (req, res) => {
+productRouter.put('/:pid', async (req, res) => {
     const { pid } = req.params;
     const { title, description, stock, code, price, category } = req.body;
     try {
-        const respuesta = productModel.findByIdAndUpdate(pid, {
+        const respuesta = await productModel.findByIdAndUpdate(pid, {
             title, description, stock, code, price, category
         });
         respuesta ? res.status(200).send({ resultado: 'OK', message: respuesta }) : res.status(404).send({ error: `No se encontró el producto ${pid}` });

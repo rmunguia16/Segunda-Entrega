@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-const messageSchema = new Schema({
+const productSchema = new Schema({
     title: {
         type: String,
         required: true,
@@ -20,6 +20,7 @@ const messageSchema = new Schema({
     category: {
         type:String,
         required: true,
+        index: true
 },
     status: {
         type:Boolean,
@@ -32,4 +33,4 @@ const messageSchema = new Schema({
     thumbnail: []
 });
 
-export const productModel = model('products', messageSchema);
+export const productModel = model('products', productSchema);

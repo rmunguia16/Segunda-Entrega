@@ -2,18 +2,22 @@ import express from 'express';
 import productsRouter from "./routes/products.routes.js";
 import cartRouter from "./routes/cart.routes.js"; 
 import { engine } from 'express-handlebars';
+import Handlebars from 'handlebars';
 import __dirname from "./utils.js";
 import path from 'path';
 import { Server } from 'socket.io';
-import PM from '../productManager.js';
 import mongoose from 'mongoose';
+import {productModel} from './models/products.models.js';
+import cartModel from './models/cart.models.js';
+import {allowInsecurePrototypeAccess} from '@handlebars/allow-prototype-access';
 
-const pm = new PM.ProductManager(path.resolve(__dirname, '../products.json'));
 const PORT = 4000;
-const uri = "mongodb+srv://rulink:coderhouse@cluster0.qa4tn25.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp";
+const uri = "mongodb+srv://rulink:coderhouse@cluster0.qa4tn25.mongodb.net/Proyecto_Cursada_47280?retryWrites=true&w=majority&appName=AtlasApp";
 
 mongoose.connect(uri)
-    .then(() => console.log('Base de datos conectada'))
+    .then(async () => {console.log('Base de datos conectada')
+        //await cartModel.create({})
+    })
     .catch(e => console.log(e));
 
 
@@ -23,17 +27,29 @@ const io = new Server(server);
 
 io.on('connection', (socket) => {
     console.log('Un cliente se ha conectado');
-    socket.on('newProduct', (product) => {
+
+    socket.on('agregarProducto', async (product) => {
         console.log(product);
-        socket.emit('agregar',pm.addProduct(product));
+        try{
+            await productModel.create(product);
+            let products = await productModel.find()
+            io.emit('productos', products);
+        }catch(e){
+            console.log(e);
+        }
     });
+
+
 });
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static(`${__dirname}/public`));
 
-app.engine('handlebars', engine());
+app.engine('handlebars', engine({
+    handlebars: allowInsecurePrototypeAccess(Handlebars)
+}));
+
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, '/views'));
 app.set('io', io);
@@ -50,25 +66,12 @@ app.get('/', (req, res) => {
     );
 });
 
-app.get('/realtimeproducts', (req, res) => {
-    let products = pm.getProducts();
+app.get('/realtimeproducts', async (req, res) => {
     let { limit } = req.query;
-    if (limit == undefined) {
-        res.render("realTimeProducts", {
-            products: products,
-            rutaJs: "realTimeProducts",
-            rutaCss: "realTimeProducts"
-        });
-    }
-    else {
-        let productLimit = [];
-        for (let i = 0; i < limit; i++) {
-            productLimit.push(products[i]);
-        }
-        res.render("realTimeProducts", {
-            products: productLimit,
-            rutaJs: "realTimeProducts",
-            rutaCss: "realTimeProducts"
-        });
-    }
+    let products = await productModel.find().limit(parseInt(limit));
+    res.render("realTimeProducts", {
+        products: products,
+        rutaJs: "realTimeProducts",
+        rutaCss: "realTimeProducts"
+    });
 }); 

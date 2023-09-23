@@ -1,5 +1,5 @@
 <div class="main">
-    <div class="products">
+    <div class="products" id="Productos">
         {{#each products}}
         <div class="product">
             <h2>{{this.title}}</h2>
@@ -9,11 +9,7 @@
             <p>{{this.status}}</p>
             <p>{{this.stock}}</p>
             <p>{{this.category}}</p>
-            {{#if thumbnail}}
             <img src="{{this.thumbnail}}" alt="{{title}}">
-            {{else}}
-            <p>{{this.thumbnail}}</p>
-            {{/if}}
         </div>
         {{/each}}
     </div>
@@ -39,7 +35,7 @@
             <label for="thumbnail">thumbnail</label>
             <input type="text" name="thumbnail" placeholder="Imagen">
             <div>
-                <button type="submit">Agregar</button>
+                <button type="submit" id="BotonAgregar">Agregar</button>
             </div>
         </form>
     </div>
